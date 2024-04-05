@@ -19,7 +19,9 @@ export function getSchemaUtils<Raw, Parsed>(schema: BaseSchema<Raw, Parsed>): Sc
         optional: () => optional(schema),
         transform: (transformer) => transform(schema, transformer),
         parseOrThrow: async (raw, opts) => {
+            console.time(`PARSE`)
             const parsed = await schema.parse(raw, opts);
+            console.timeEnd(`PARSE`)
             if (parsed.ok) {
                 return parsed.value;
             }

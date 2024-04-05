@@ -82,8 +82,10 @@ async function validateAndTransformRecord<TransformedKey extends string | number
 
     return entries(value).reduce<Promise<MaybeValid<Record<TransformedKey, TransformedValue>>>>(
         async (accPromise, [stringKey, value]) => {
+            console.time(`PARSE ${stringKey}`);
             // skip nullish keys
             if (value == null) {
+                console.timeEnd(`PARSE ${stringKey}`);
                 return accPromise;
             }
 
@@ -96,11 +98,17 @@ async function validateAndTransformRecord<TransformedKey extends string | number
                     key = numberKey;
                 }
             }
+            console.time(`transformKey ${key}`)
             const transformedKey = await transformKey(key);
+            console.timeEnd(`transformKey ${key}`)
 
+
+            console.time(`transformValue ${key}`)
             const transformedValue = await transformValue(value, key);
+            console.timeEnd(`transformValue ${key}`)
 
             if (acc.ok && transformedKey.ok && transformedValue.ok) {
+                console.timeEnd(`PARSE ${stringKey}`);
                 return {
                     ok: true,
                     value: {
@@ -121,6 +129,7 @@ async function validateAndTransformRecord<TransformedKey extends string | number
                 errors.push(...transformedValue.errors);
             }
 
+            console.timeEnd(`PARSE ${stringKey}`);
             return {
                 ok: false,
                 errors,

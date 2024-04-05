@@ -140,6 +140,7 @@ export class Records {
             _queryParams["q"] = q;
         }
 
+        console.time(`API REQUEST`);
         const _response = await (this._options.fetcher ?? core.fetcher)({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.FlatfileEnvironment.Production,
@@ -160,6 +161,7 @@ export class Records {
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
+        console.timeEnd(`API REQUEST`);
         if (_response.ok) {
             return await serializers.GetRecordsResponse.parseOrThrow(_response.body, {
                 unrecognizedObjectKeys: "passthrough",
